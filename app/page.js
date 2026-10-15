@@ -1,69 +1,209 @@
-import Image from "next/image";
+'use client';
+
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { FileText, ShieldAlert, ArrowRight, UploadCloud, CheckCircle, BarChart2 } from 'lucide-react';
+import Navbar from '../components/Navbar';
+import StepIndicator from '../components/StepIndicator';
+import Footer from '../components/Footer';
+import OtpModal from '../components/OtpModal';
 
 export default function Home() {
+  const router = useRouter();
+  
+  const [formData, setFormData] = useState({
+    fullName: '',
+    idNumber: '',
+    district: 'محافظة القاهرة'
+  });
+  
+  const [idImage, setIdImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOtpOpen, setIsOtpOpen] = useState(false);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setIdImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setErrorMsg('');
+
+    if (formData.fullName.trim().split(' ').length < 3) {
+      setErrorMsg('الرجاء إدخال الاسم ثلاثياً أو رباعياً كما هو مكتوب في الهوية.');
+      return;
+    }
+
+    if (formData.idNumber.length < 10) {
+      setErrorMsg('رقم الهوية غير صحيح، يجب ألا يقل عن 10 أرقام.');
+      return;
+    }
+
+    if (!idImage) {
+      setErrorMsg('الرجاء رفع صورة وجه بطاقة الرقم القومي أو جواز السفر.');
+      return;
+    }
+
+    setIsLoading(true);
+    
+    // إظهار نافذة التحقق OTP بعد المعالجة المؤقتة
+    setTimeout(() => {
+      setIsLoading(false);
+      setIsOtpOpen(true);
+    }, 800);
+  };
+
+  const egyptGovernorates = [
+    'محافظة القاهرة', 'محافظة الجيزة', 'محافظة الإسكندرية', 'محافظة الدقهلية',
+    'محافظة الشرقية', 'محافظة الغربية', 'محافظة المنوفية', 'محافظة القليوبية',
+    'محافظة البحيرة', 'محافظة كفر الشيخ', 'محافظة دمياط', 'محافظة بورسعيد',
+    'محافظة الإسماعيلية', 'محافظة السويس', 'محافظة شمال سيناء', 'محافظة جنوب سيناء',
+    'محافظة البحر الأحمر', 'محافظة الفيوم', 'محافظة بني سويف', 'محافظة المنيا',
+    'محافظة أسيوط', 'محافظة سوهاج', 'محافظة قنا', 'محافظة الأقصر',
+    'محافظة أسوان', 'محافظة الوادي الجديد', 'محافظة مطروح'
+  ];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.js
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main dir="rtl" className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-4 md:p-8 flex flex-col justify-between">
+      <div>
+        <Navbar />
+        
+        {/* رابط الوصول المباشر للوحة الإحصائيات النتائج المباشرة */}
+        <div className="max-w-xl mx-auto w-full flex justify-end mb-3">
+          <Link 
+            href="/dashboard" 
+            className="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 bg-cyan-950/40 border border-cyan-500/30 px-3 py-1.5 rounded-xl transition backdrop-blur-md"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <BarChart2 className="w-3.5 h-3.5" />
+            <span>عرض نتائج الاقتراع المباشرة</span>
+          </Link>
         </div>
-      </main>
-    </div>
+
+        <StepIndicator currentStep={1} />
+
+        {/* Card Container */}
+        <div className="max-w-xl mx-auto w-full bg-slate-800/80 backdrop-blur-xl border border-blue-700/30 rounded-2xl shadow-2xl p-6 md:p-8">
+          
+          <div className="mb-6">
+            <h2 className="text-xl font-bold flex items-center gap-2 text-blue-300">
+              <FileText className="w-5 h-5 text-blue-400" /> التحقق من بيانات الهوية الرسمية
+            </h2>
+            <p className="text-xs text-slate-400 mt-1">
+              يتم تشفير وتأمين كافة البيانات المدخلة وفصلها عن سجلات الاقتراع لضمان السرية المطلقة.
+            </p>
+          </div>
+
+          {errorMsg && (
+            <div className="mb-4 bg-rose-500/20 border border-rose-500/40 text-rose-300 p-3 rounded-xl text-xs flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">الاسم الرباعي (مطابق للهوية)</label>
+              <input 
+                type="text" 
+                placeholder="مثال: أحمد محمد محمود علي"
+                value={formData.fullName}
+                onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                className="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition text-white placeholder:text-slate-600"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">الرقم القومي (14 رقم) أو رقم جواز السفر</label>
+              <input 
+                type="text" 
+                maxLength={14}
+                placeholder="أدخل الأرقام بدقة"
+                value={formData.idNumber}
+                onChange={(e) => setFormData({...formData, idNumber: e.target.value.replace(/\D/g, '')})}
+                className="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition text-white placeholder:text-slate-600 font-mono tracking-wider"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">اختر الدائرة الانتخابية / المحافظة</label>
+              <select 
+                value={formData.district}
+                onChange={(e) => setFormData({...formData, district: e.target.value})}
+                className="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition text-white cursor-pointer"
+              >
+                {egyptGovernorates.map((gov) => (
+                  <option key={gov} value={gov} className="bg-slate-900 text-white">
+                    {gov}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">صورة بطاقة الرقم القومي أو جواز السفر (الوجه الأمامي)</label>
+              <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-blue-500 bg-slate-900/50 rounded-xl p-4 cursor-pointer transition group">
+                {imagePreview ? (
+                  <div className="flex items-center gap-3 w-full">
+                    <img src={imagePreview} alt="ID Preview" className="w-16 h-12 object-cover rounded-lg border border-slate-600" />
+                    <div className="flex-1 truncate">
+                      <p className="text-xs text-emerald-400 font-medium flex items-center gap-1">
+                        <CheckCircle className="w-3.5 h-3.5" /> تم رفع الصورة بنجاح
+                      </p>
+                      <p className="text-[11px] text-slate-400 truncate">{idImage?.name}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center text-center py-2">
+                    <UploadCloud className="w-8 h-8 text-blue-400 mb-1 group-hover:scale-110 transition duration-300" />
+                    <span className="text-xs text-slate-300 font-medium">اضغط لرفع صورة البطاقة أو جواز السفر أو اسحبها هنا</span>
+                    <span className="text-[10px] text-slate-500 mt-0.5">PNG, JPG حتى 10MB</span>
+                  </div>
+                )}
+                <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+              </label>
+            </div>
+
+            <button 
+              type="submit"
+              disabled={isLoading}
+              className="w-full mt-6 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-medium py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 cursor-pointer"
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>جاري معالجة وتشفير البيانات...</span>
+                </div>
+              ) : (
+                <>
+                  <span>الانتقال لبصمة الوجه الحية</span>
+                  <ArrowRight className="w-4 h-4 rotate-180" />
+                </>
+              )}
+            </button>
+          </form>
+
+        </div>
+      </div>
+
+      {/* نافذة إدخال رمز التحقق (OTP) */}
+      <OtpModal 
+        isOpen={isOtpOpen} 
+        onVerify={() => {
+          setIsOtpOpen(false);
+          router.push('/face-scan');
+        }} 
+      />
+
+      <Footer />
+    </main>
   );
 }
