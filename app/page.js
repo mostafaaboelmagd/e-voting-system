@@ -2,12 +2,10 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { FileText, ShieldAlert, ArrowRight, UploadCloud, CheckCircle, BarChart2 } from 'lucide-react';
+import { FileText, ShieldAlert, ArrowRight, UploadCloud, CheckCircle } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import StepIndicator from '../components/StepIndicator';
 import Footer from '../components/Footer';
-import OtpModal from '../components/OtpModal';
 
 export default function Home() {
   const router = useRouter();
@@ -22,7 +20,6 @@ export default function Home() {
   const [imagePreview, setImagePreview] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isOtpOpen, setIsOtpOpen] = useState(false);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -55,11 +52,11 @@ export default function Home() {
 
     setIsLoading(true);
     
-    // إظهار نافذة التحقق OTP بعد المعالجة المؤقتة
+    // الانتقال المباشر لصفحة بصمة الوجه بعد المعالجة المؤقتة
     setTimeout(() => {
       setIsLoading(false);
-      setIsOtpOpen(true);
-    }, 800);
+      router.push('/face-scan');
+    }, 1000);
   };
 
   const egyptGovernorates = [
@@ -76,18 +73,6 @@ export default function Home() {
     <main dir="rtl" className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-4 md:p-8 flex flex-col justify-between">
       <div>
         <Navbar />
-        
-        {/* رابط الوصول المباشر للوحة الإحصائيات النتائج المباشرة */}
-        <div className="max-w-xl mx-auto w-full flex justify-end mb-3">
-          <Link 
-            href="/dashboard" 
-            className="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 bg-cyan-950/40 border border-cyan-500/30 px-3 py-1.5 rounded-xl transition backdrop-blur-md"
-          >
-            <BarChart2 className="w-3.5 h-3.5" />
-            <span>عرض نتائج الاقتراع المباشرة</span>
-          </Link>
-        </div>
-
         <StepIndicator currentStep={1} />
 
         {/* Card Container */}
@@ -193,15 +178,6 @@ export default function Home() {
 
         </div>
       </div>
-
-      {/* نافذة إدخال رمز التحقق (OTP) */}
-      <OtpModal 
-        isOpen={isOtpOpen} 
-        onVerify={() => {
-          setIsOtpOpen(false);
-          router.push('/face-scan');
-        }} 
-      />
 
       <Footer />
     </main>
