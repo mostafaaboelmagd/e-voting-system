@@ -15,38 +15,56 @@ export default function FaceCamera({ capturedImage, setCapturedImage, isVerifyin
   }, [webcamRef, setCapturedImage]);
 
   return (
-    <div className="flex flex-col items-center space-y-4">
-      {/* إطار الكاميرا الدائري */}
-      <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-blue-500/60 shadow-2xl bg-slate-900 flex items-center justify-center">
+    <div className="flex flex-col items-center space-y-5">
+      {/* إطار الكاميرا الدائري مع التأثيرات والتوجيه */}
+      <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-blue-500/70 shadow-2xl shadow-blue-500/20 bg-slate-950 flex items-center justify-center">
         {!capturedImage ? (
-          <Webcam
-            audio={false}
-            ref={webcamRef}
-            screenshotFormat="image/jpeg"
-            className="w-full h-full object-cover"
-            videoConstraints={{ facingMode: 'user' }}
-          />
+          <>
+            <Webcam
+              audio={false}
+              ref={webcamRef}
+              mirrored={true} // 👈 يضبط الاتجاه التلقائي الطبيعي للوجه أمام الكاميرا
+              screenshotFormat="image/jpeg"
+              className="w-full h-full object-cover"
+              videoConstraints={{
+                facingMode: 'user',
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+              }}
+            />
+
+            {/* شعاع ومؤشر التوجيه البيولوجي */}
+            <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+              <div className="w-48 h-48 border-2 border-dashed border-cyan-400/60 rounded-full animate-pulse"></div>
+              <div className="absolute w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-[bounce_2s_infinite]"></div>
+            </div>
+          </>
         ) : (
-          <img src={capturedImage} alt="Captured Face" className="w-full h-full object-cover" />
+          /* عرض الصورة الملتقطة بـ scale-x-100 لتطابق اتجاه الكاميرا بالضبط */
+          <img 
+            src={capturedImage} 
+            alt="Captured Face" 
+            className="w-full h-full object-cover -scale-x-100" 
+          />
         )}
 
-        {/* مؤشر المسح الضوئي عند التحليل */}
+        {/* مؤشر المسح الضوئي عند التحليل والمطابقة */}
         {isVerifying && (
-          <div className="absolute inset-0 bg-blue-600/20 backdrop-blur-sm flex flex-col items-center justify-center animate-pulse">
+          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center animate-pulse z-10">
             <div className="w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin mb-2"></div>
-            <span className="text-xs font-semibold text-blue-200">جاري مطابقة ملامح الوجه...</span>
+            <span className="text-xs font-semibold text-cyan-300">جاري مطابقة بصمة الوجه...</span>
           </div>
         )}
       </div>
 
       {/* أزرار التحكم وحالة التحقق */}
       {verifySuccess ? (
-        <div className="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 py-2.5 px-6 rounded-xl text-xs font-medium flex items-center gap-2">
+        <div className="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 py-2.5 px-6 rounded-xl text-xs font-medium flex items-center gap-2 shadow-lg shadow-emerald-500/10">
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-          <span>تم التحقق البيولوجي بنجاح!</span>
+          <span>تم التحقق البيولوجي والمطابقة بنجاح!</span>
         </div>
       ) : (
-        <div className="flex gap-3 pt-2">
+        <div className="flex gap-3 pt-1">
           {!capturedImage ? (
             <button
               type="button"
@@ -61,9 +79,9 @@ export default function FaceCamera({ capturedImage, setCapturedImage, isVerifyin
                 type="button"
                 onClick={() => setCapturedImage(null)}
                 disabled={isVerifying}
-                className="bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-white px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-1.5 cursor-pointer"
+                className="bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-300 px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-1.5 border border-slate-700 cursor-pointer"
               >
-                <RefreshCw className="w-3.5 h-3.5" /> إعادة
+                <RefreshCw className="w-3.5 h-3.5" /> إعادة التقاط
               </button>
               <button
                 type="button"

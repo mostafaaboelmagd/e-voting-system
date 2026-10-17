@@ -33,9 +33,19 @@ export default function BallotPage() {
     setIsSubmitting(true);
 
     setTimeout(() => {
+      const voterId = localStorage.getItem('current_voter_id');
+
+      if (voterId) {
+        const votedIds = JSON.parse(localStorage.getItem('voted_national_ids') || '[]');
+        if (!votedIds.includes(voterId)) {
+          votedIds.push(voterId);
+          localStorage.setItem('voted_national_ids', JSON.stringify(votedIds));
+        }
+      }
+
       const voteData = {
         candidateId: selectedCandidate,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().toLocaleString('ar-EG'),
         txHash: '0x' + Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join('')
       };
 
@@ -49,14 +59,17 @@ export default function BallotPage() {
   };
 
   return (
-    <main dir="rtl" className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-4 md:p-8 flex flex-col justify-between">
-      <div>
+    <main 
+      dir="rtl" 
+      className="relative min-h-screen text-white p-4 md:p-8 flex flex-col justify-between bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+    >
+      <div className="relative z-10">
         <Navbar />
         <StepIndicator currentStep={3} />
 
         <div className="max-w-2xl mx-auto w-full">
           {/* Header Card */}
-          <div className="bg-slate-800/80 backdrop-blur-xl border border-blue-700/30 rounded-2xl p-5 mb-5 shadow-2xl">
+          <div className="bg-slate-900/80 backdrop-blur-xl border border-blue-500/30 rounded-2xl p-5 mb-5 shadow-2xl">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-blue-600/20 text-blue-400 rounded-xl flex items-center justify-center border border-blue-500/30 shrink-0">
                 <Vote className="w-5 h-5" />
@@ -70,8 +83,8 @@ export default function BallotPage() {
             </div>
           </div>
 
-          {/* Candidates List (تم حل مشكلة السكروول الأفقي هنا) */}
-          <div className="space-y-3 mb-6 max-h-[460px] overflow-y-auto overflow-x-hidden pr-2">
+          {/* Candidates List */}
+          <div className="space-y-3 mb-6 max-h-[460px] overflow-y-auto overflow-x-hidden pr-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {candidates.map((candidate) => {
               const isSelected = selectedCandidate === candidate.id;
               const CandidateIcon = candidate.icon;
@@ -82,8 +95,8 @@ export default function BallotPage() {
                   onClick={() => setSelectedCandidate(candidate.id)}
                   className={`p-4 rounded-2xl border transition-all duration-300 cursor-pointer backdrop-blur-md flex items-center justify-between gap-3 ${
                     isSelected
-                      ? 'bg-blue-900/40 border-blue-500 shadow-lg shadow-blue-500/20'
-                      : 'bg-slate-800/50 border-slate-700/80 hover:border-slate-500 hover:bg-slate-800/80'
+                      ? 'bg-blue-900/50 border-blue-400 shadow-lg shadow-blue-500/20'
+                      : 'bg-slate-900/70 border-slate-700/80 hover:border-slate-500 hover:bg-slate-900/90'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -98,7 +111,7 @@ export default function BallotPage() {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="font-bold text-sm text-white truncate">{candidate.name}</h3>
-                        <span className="text-[10px] bg-slate-700/60 text-slate-300 px-2 py-0.5 rounded-full font-medium shrink-0">
+                        <span className="text-[10px] bg-slate-800/80 text-slate-300 px-2 py-0.5 rounded-full font-medium shrink-0 border border-slate-700">
                           {candidate.party}
                         </span>
                       </div>
@@ -110,7 +123,7 @@ export default function BallotPage() {
                     <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium ${
                       isSelected 
                         ? 'bg-blue-600/30 border-blue-400 text-blue-200' 
-                        : 'bg-slate-900/60 border-slate-700 text-slate-300'
+                        : 'bg-slate-950/80 border-slate-700 text-slate-300'
                     }`}>
                       <CandidateIcon className="w-4 h-4 text-cyan-400 shrink-0" />
                       <span className="text-[11px] hidden sm:inline">{candidate.symbolName}</span>
@@ -143,7 +156,9 @@ export default function BallotPage() {
         </div>
       </div>
 
-      <Footer />
+      <div className="relative z-10 mt-6">
+        <Footer />
+      </div>
     </main>
   );
 }
