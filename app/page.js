@@ -7,6 +7,8 @@ import {
   User, MapPin, Upload, FileCheck, Image as ImageIcon 
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
+import TopBanner from '../components/TopBanner';
+import CountdownTimer from '../components/CountdownTimer';
 import StepIndicator from '../components/StepIndicator';
 import Footer from '../components/Footer';
 import AlreadyVotedModal from '../components/AlreadyVotedModal';
@@ -94,7 +96,7 @@ export default function HomePage() {
     localStorage.setItem('current_voter_id', id);
     localStorage.setItem('current_voter_info', JSON.stringify(voterData));
 
-    // التوجيه إلى المسار الصحيح المطابق لاسم المجلد لديك (verify-id)
+    // التوجيه إلى المسار الصحيح المطابق لاسم المجلد (verify-id)
     router.push('/verify-id');
   };
 
@@ -105,6 +107,14 @@ export default function HomePage() {
     >
       <div className="relative z-10">
         <Navbar />
+        
+        {/* الشريط الإعلاني التنبيهي */}
+        <TopBanner />
+
+        {/* العداد التنازلي لغلق اللجان الرقمية */}
+        <CountdownTimer />
+
+        {/* مؤشر الخطوات */}
         <StepIndicator currentStep={1} />
 
         <div className="max-w-xl mx-auto w-full bg-slate-900/80 backdrop-blur-xl border border-blue-500/30 rounded-2xl p-6 md:p-8 shadow-2xl mb-8">
