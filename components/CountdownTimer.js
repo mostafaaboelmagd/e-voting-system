@@ -4,13 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { Clock } from 'lucide-react';
 
 export default function CountdownTimer() {
-  // حساب الوقت المتبقي حتى نهاية اليوم (أو ساعة محددة مثل 8 مساءً)
+  const [mounted, setMounted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0, isEnded: false });
+
   const calculateTimeLeft = () => {
     const now = new Date();
     const target = new Date();
     target.setHours(20, 0, 0, 0); // ينتهي الاقتراع الساعة 8 مساءً
 
-    // إذا انتهى اليوم، نجعل المستهدف نهاية اليوم الحالي
     const difference = target - now;
 
     if (difference <= 0) {
@@ -24,15 +25,21 @@ export default function CountdownTimer() {
     return { hours, minutes, seconds, isEnded: false };
   };
 
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
-
   useEffect(() => {
+    setMounted(true);
+    setTimeLeft(calculateTimeLeft());
+
     const timer = setInterval(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
 
     return () => clearInterval(timer);
   }, []);
+
+  // عدم عرض المكون على السيرفر لمنع التعارض حتى يكتمل التحميل في متصفح العميل
+  if (!mounted) {
+    return null;
+  }
 
   if (timeLeft.isEnded) {
     return (
