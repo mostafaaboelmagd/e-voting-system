@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Lock, HelpCircle } from 'lucide-react';
+import { Lock, HelpCircle, Headphones, Activity } from 'lucide-react';
 import InstructionsModal from './InstructionsModal';
+import SupportModal from './SupportModal';
 
 export default function Navbar() {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
 
   return (
     <>
@@ -30,26 +32,45 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* شارة التشفير وزر الإرشادات */}
+        {/* شارة حالة الاتصال، التشفير، الإرشادات، والدعم الفني */}
         <div className="mt-3 flex items-center justify-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1.5 bg-slate-800/60 border border-slate-700/50 px-3.5 py-1 rounded-xl text-[11px] text-slate-300 backdrop-blur-md">
-            <Lock className="w-3.5 h-3.5 text-emerald-400" />
-            <span>تشفير مؤمن 256-bit</span>
+          
+          {/*  شارة حالة الاتصال بالسيرفر المباشرة */}
+          <div className="flex items-center gap-2 bg-emerald-950/40 border border-emerald-500/30 px-3 py-1 rounded-xl text-[11px] text-emerald-400 backdrop-blur-md">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="font-medium">السيرفر متصل | النظام يعمل بكفاءة</span>
           </div>
 
+          {/* زر إرشادات الناخب */}
           <button
             type="button"
             onClick={() => setIsHelpOpen(true)}
             className="flex items-center gap-1.5 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 px-3 py-1 rounded-xl text-[11px] text-slate-300 transition cursor-pointer"
           >
             <HelpCircle className="w-3.5 h-3.5 text-cyan-400" />
-            <span>إرشادات الناخب</span>
+            <span>الإرشادات</span>
+          </button>
+
+          {/* زر الدعم الفني */}
+          <button
+            type="button"
+            onClick={() => setIsSupportOpen(true)}
+            className="flex items-center gap-1.5 bg-blue-950/60 hover:bg-blue-900/50 border border-blue-500/30 px-3 py-1 rounded-xl text-[11px] text-blue-300 hover:text-white transition cursor-pointer backdrop-blur-md"
+          >
+            <Headphones className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+            <span>الدعم الفني</span>
           </button>
         </div>
       </header>
 
       {/* مودال الإرشادات */}
       <InstructionsModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+
+      {/* مودال الدعم الفني */}
+      <SupportModal isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
     </>
   );
 }
