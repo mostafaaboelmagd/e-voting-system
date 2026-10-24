@@ -16,7 +16,7 @@ export default function Navbar() {
           <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-tr from-blue-600 via-indigo-500 to-cyan-400 p-0.5 shadow-lg shadow-blue-500/30 shrink-0">
             <div className="w-full h-full bg-slate-950 rounded-full flex items-center justify-center overflow-hidden p-0.5">
               <img
-                src="/images/Logo.png"
+                src="/images/logo.png"
                 alt="شعار منظومة الانتخابات الرقمية"
                 className="w-full h-full object-contain rounded-full scale-105"
               />
